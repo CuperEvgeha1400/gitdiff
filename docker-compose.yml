@@ -12,7 +12,8 @@ services:
     restart:
       on-failure
     networks:
-      - git_back
+      - gitlab_net
+
   redis:
     image: redis:latest
     ports:
@@ -23,5 +24,37 @@ services:
       timeout: 30s
       retries: 50
     restart: on-failure
+
+  gitlab:
+    image: 'gitlab/gitlab-ee:latest'
+    restart: always
+    hostname: 'gitlab.example.com'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['gitlab_shell_ssh_port'] = 22
+        external_url 'http://gitlab.example.com:443'
+    ports:
+      - '80:80'
+      - '443:443'
+      - '22:22'
+    volumes:
+      - /data/docker/gitlab/etc/gitlab:/etc/gitlab
+      - /data/docker/gitlab/var/opt/gitlab:/var/opt/gitlab
+      - /data/docker/gitlab/var/log/gitlab:/var/log/gitlab
+    shm_size: '256m'
+    networks:
+      - gitlab_net
+
+  gitlab-runner:
+    image: gitlab/gitlab-runner:alpine
+    restart: unless-stopped
+    depends_on:
+      - gitlab
+    volumes:
+      - /data/docker/gitlab/etc/gitlab-runner:/etc/gitlab-runner
+      - /data/docker/gitlab/var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - gitlab_net
+
 networks:
-  git_back:
+  gitlab_net:
