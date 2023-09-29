@@ -3,16 +3,29 @@ services:
   backend:
     container_name: git_diff
     build:
-      context: gitdiff/
+      context: backend/
     command: bash -c "python /app/manage.py makemigrations app && python /app/manage.py migrate --noinput && python /app/manage.py runserver 0.0.0.0:8000"
     volumes:
-      - ./gitdiff/:/app
+      - ./backend/:/app
     ports:
       - 8000:8000
     restart:
       on-failure
     networks:
       - gitlab_net
+      - front_back
+
+  frontend:
+    build:
+      context: frontend/
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+    restart:
+      on-failure
+    networks:
+      - front_back
 
   redis:
     image: redis:latest
@@ -34,7 +47,7 @@ services:
         gitlab_rails['gitlab_shell_ssh_port'] = 22
         external_url 'http://gitlab.example.com:443'
     ports:
-      - '80:80'
+      - '81:80'
       - '443:443'
       - '22:22'
     volumes:
@@ -58,3 +71,4 @@ services:
 
 networks:
   gitlab_net:
+  front_back:
