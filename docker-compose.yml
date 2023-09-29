@@ -1,0 +1,27 @@
+version: '3.4'
+services:
+  backend:
+    container_name: git_diff
+    build:
+      context: gitdiff/
+    command: bash -c "python /app/manage.py makemigrations app && python /app/manage.py migrate --noinput && python /app/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./gitdiff/:/app
+    ports:
+      - 8000:8000
+    restart:
+      on-failure
+    networks:
+      - git_back
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    restart: on-failure
+networks:
+  git_back:
