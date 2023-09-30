@@ -1,0 +1,5 @@
+export { userReducer, authUser } from './models/slice/userSlice'
+export { getStateUser } from './models/selectors/getStateUser'
+export { getUserName } from './models/selectors/getUserName'
+export { getUserToken } from './models/selectors/getUserToken'
+export { getUserIdUser } from './models/selectors/getUserIdUser'

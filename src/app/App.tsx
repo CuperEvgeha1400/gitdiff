@@ -1,8 +1,10 @@
-import react from 'react'
-import cls from './styles/App.module.scss'
 import './styles/index.scss'
+import { NavBar } from 'widgets/NavBar'
+import { MainPage } from 'pages/MainPage'
+
 export const App: React.FC = () => {
     return (<>
- <h1 className={cls.h1c}>Working!</h1>
-        </>)
+        <NavBar/>
+        <MainPage/>
+    </>)
 }

@@ -1,0 +1,26 @@
+.ModelContainer{
+  position: fixed;
+  pointer-events: none;
+  opacity: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: rgb(140, 135, 135);
+  transition: all 0.3s linear;
+}
+
+.ContentContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.Open {
+  pointer-events: auto;
+  opacity: 1;
+  transition: all 0.3s linear;
+}

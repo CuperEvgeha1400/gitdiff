@@ -16,7 +16,7 @@ export const webpackSetUp = (settings: webpackSettings): webpack.Configuration =
          filename: '[name].[contenthash].js',
             clean: true
         },
-      resolve: resolveSettings(),
+      resolve: resolveSettings(settings.paths),
         module: {
          rules: rulesSettings(settings.isDev)
         },

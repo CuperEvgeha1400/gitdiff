@@ -1,7 +1,8 @@
 export interface Paths {
     entry: string,
     output: string,
-    htmlPluginTemplate: string
+    htmlPluginTemplate: string,
+    absolutePath: string
 }
 export enum Mode {
     PRODUCTION = 'production',

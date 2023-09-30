@@ -1,0 +1,20 @@
+.intro{
+
+}
+.flexIntro {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+.introContainer {
+  max-width: 1024px;
+  margin: 0 auto;
+
+}
+
+.flexIntro h1 {
+  margin-left: 40px;
+  font-size: 100px;
+
+}

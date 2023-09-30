@@ -23,8 +23,16 @@ export const rulesSettings = (isDev: boolean): webpack.RuleSetRule[] => {
             "sass-loader",
         ],
     }
+    const fileRule = {
+        test: /\.(png|jpg|gif|svg)$/i,
+        type: 'asset/resource',
+        generator: {
+            filename: 'static/images/[hash][ext][query]'
+        }
+    }
     return [
        tsRule,
-        styleRule
+        styleRule,
+        fileRule
     ]
 }
