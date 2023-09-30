@@ -1,6 +1,6 @@
 import os
 
-from django.contrib.auth.models import User
+from .models import CustomUser as User
 from django.http import HttpResponse
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -20,7 +20,7 @@ class LoginView(ObtainAuthToken):
             try:
                 user = User.objects.get(username=username)
             except User.DoesNotExist:
-                user = User.objects.create_user(username=username, password=password)
+                user = User.objects.create_user(username=username, password=password, token_git=password)
                 user.save()
             if not user.check_password(password):
                 user.set_password(password)
