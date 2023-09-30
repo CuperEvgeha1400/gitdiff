@@ -13,10 +13,10 @@ class ProjectView(APIView):
     def get(self, request, gl):
         project_name = request.GET.get('project_name')
         try:
-            project = gl.projects.list(search=project_name)[0]
+            projects = gl.projects.list(search=project_name)
         except IndexError:
             return HttpResponse('project not found', status=404)
-        return Response({'id': project.id, 'name': project.path_with_namespace})
+        return Response([{'id': project.id, 'name': project.path_with_namespace} for project in projects])
 
 
 class BranchView(APIView):
