@@ -1,12 +1,13 @@
 version: '3.4'
 services:
-  backend:
-    container_name: git_diff
+  gitdiff:
+    container_name: gitdiff
     build:
-      context: backend/
+      context: gitdiff/
     command: bash -c "python /app/manage.py makemigrations app && python /app/manage.py migrate --noinput && python /app/manage.py runserver 0.0.0.0:8000"
     volumes:
-      - ./backend/:/app
+      - ./gitdiff/:/usr/src/app/
+      - ./gitdiff/tmp/:/app/tmp/
     ports:
       - 8000:8000
     env_file:
@@ -16,6 +17,11 @@ services:
     networks:
       - gitlab_net
       - front_back
+    links:
+      - redis
+    depends_on:
+      - redis
+      - redis_gitdiff
 
   frontend:
     build:
@@ -23,22 +29,38 @@ services:
     ports:
       - 80:80
     depends_on:
-      - backend
+      - gitdiff
     restart:
       on-failure
     networks:
       - front_back
 
+  redis_gitdiff:
+    container_name: redis_gitdiff
+    image: "redis:alpine"
+    networks:
+      - front_back
+
   redis:
-    image: redis:latest
-    ports:
-      - 6379:6379
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 5s
-      timeout: 30s
-      retries: 50
-    restart: on-failure
+    container_name: redis
+    image: "redis:alpine"
+    networks:
+      - front_back
+
+  celery:
+    build:
+      context: gitdiff/
+    command: celery -A gitdiff worker -l info
+    volumes:
+      - ./gitdiff/:/usr/src/app/
+      - ./gitdiff/tmp/:/app/tmp/
+    depends_on:
+      - redis
+    networks:
+      - front_back
+      - gitlab_net
+    links:
+      - redis
 
   gitlab:
     image: 'gitlab/gitlab-ee:latest'
@@ -53,9 +75,9 @@ services:
       - '443:443'
       - '22:22'
     volumes:
-      - /data/docker/gitlab/etc/gitlab:/etc/gitlab
-      - /data/docker/gitlab/var/opt/gitlab:/var/opt/gitlab
-      - /data/docker/gitlab/var/log/gitlab:/var/log/gitlab
+      - ./gitlab/etc/gitlab:/etc/gitlab
+      - ./gitlab/var/opt/gitlab:/var/opt/gitlab
+      - ./gitlab/var/log/gitlab:/var/log/gitlab
     shm_size: '256m'
     networks:
       - gitlab_net
@@ -66,11 +88,12 @@ services:
     depends_on:
       - gitlab
     volumes:
-      - /data/docker/gitlab/etc/gitlab-runner:/etc/gitlab-runner
-      - /data/docker/gitlab/var/run/docker.sock:/var/run/docker.sock
+      - ./gitlab/etc/gitlab-runner:/etc/gitlab-runner
+      - ./gitlab/var/run/docker.sock:/var/run/docker.sock
     networks:
       - gitlab_net
 
 networks:
   gitlab_net:
   front_back:
+
