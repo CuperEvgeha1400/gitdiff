@@ -17,3 +17,15 @@ class ProjectView(APIView):
         except IndexError:
             return HttpResponse('project not found', status=404)
         return Response({'id': project.id, 'name': project.path_with_namespace})
+
+
+class BranchView(APIView):
+    @login_decorator
+    def get(self, request, gl):
+        project_id = request.GET.get('project_id')
+        try:
+            project = gl.projects.get(project_id)
+        except IndexError:
+            return HttpResponse('project not found', status=404)
+        branch_name = [i.name for i in project.branches.list()]
+        return Response({'id': project.id, 'branches': branch_name})
